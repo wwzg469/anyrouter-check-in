@@ -75,7 +75,7 @@ async def get_waf_cookies_with_playwright(account_name: str, login_url: str, req
 		with tempfile.TemporaryDirectory() as temp_dir:
 			context = await p.chromium.launch_persistent_context(
 				user_data_dir=temp_dir,
-				headless=True,
+				headless=False,
 				user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36',
 				viewport={'width': 1920, 'height': 1080},
 				args=[
@@ -134,6 +134,9 @@ def get_user_info(client, headers, user_info_url: str):
 	try:
 		response = client.get(user_info_url, headers=headers, timeout=30)
 
+		# 确保响应使用 UTF-8 编码
+		response.encoding = 'utf-8'
+
 		if response.status_code == 200:
 			data = response.json()
 			if data.get('success'):
@@ -176,6 +179,9 @@ def execute_check_in(client, account_name: str, provider_config, headers: dict):
 
 	sign_in_url = f'{provider_config.domain}{provider_config.sign_in_path}'
 	response = client.post(sign_in_url, headers=checkin_headers, timeout=30)
+
+	# 确保响应使用 UTF-8 编码
+	response.encoding = 'utf-8'
 
 	print(f'[RESPONSE] {account_name}: Response status code {response.status_code}')
 
